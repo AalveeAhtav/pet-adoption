@@ -15,5 +15,6 @@ npm run dev
 
 ## If you are working on the backend
 ```bash
+mkdir backend (from project directory)
 cd backend
 ```
