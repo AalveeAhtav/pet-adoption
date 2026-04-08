@@ -1,3 +1,5 @@
+//navbar for quick navigation across the website. It includes the logo, navigation links, and login/register buttons.
+
 function Navbar() {
     return (
         <header className="w-full bg-white">

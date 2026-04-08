@@ -1,9 +1,12 @@
+//main homepage for the pet adoption website. It includes a hero section, featured pets, and an explanation of the adoption process.
+
 import Navbar from "../components/Navbar";
 import SearchCard from "../components/SearchCard";
 import Footer from "../components/Footer";
 import heroImage from "../assets/hero_cat.jpg";
 
 function Home() {
+    // These are dummy data so that I could quickly build the UI. The actual data would come from an API or database.
     const featuredPets = [
             {
             id: 1,
@@ -39,6 +42,7 @@ function Home() {
             },
         ];
 
+    //steps for the adoption process
     const adoptionSteps = [
             {
             number: "01",
@@ -57,10 +61,14 @@ function Home() {
             },
         ];
 
+        //main return statement for the homepage. It includes the navbar, hero section, featured pets, adoption steps, and footer.
         return (
             <div className="min-h-screen bg-[#f8f8f6] text-[#1f1f1f]">
+
+                {/* top navbar for the website. It includes the logo, navigation links, and login/register buttons. */}
                 <Navbar />
 
+                {/* hero section with a call to action to browse pets or start the adoption process. It also includes a search card for filtering pets. */}
                 <section className="relative">
                     <div className="mx-auto grid max-w-7xl grid-cols-1 overflow-hidden lg:grid-cols-2">
                         <div className="bg-[#1f5c3f] px-10 py-20 text-white md:px-16">
@@ -97,6 +105,7 @@ function Home() {
                     </div>
                 </section>
 
+                {/* featured pets section. It displays a grid of featured pets with their name, breed, age, and a button to view more details. */}
                 <section className="mx-auto max-w-7xl px-8 py-24">
                     <div className="flex items-center justify-between">
                         <h2 className="text-3xl font-semibold">Featured Pets</h2>
@@ -105,6 +114,7 @@ function Home() {
                         </button>
                     </div>
 
+                    {/* grid of pet cards */}
                     <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
                         {featuredPets.map((pet) => (
                             <div
@@ -138,6 +148,7 @@ function Home() {
                     </div>
                 </section>
 
+                {/* adoption steps section. It explains the steps involved in the adoption process with descriptions. */}
                 <section className="mx-auto max-w-7xl px-8 pb-24">
                     <h2 className="text-3xl font-semibold">How Adoption Works</h2>
 
@@ -158,6 +169,7 @@ function Home() {
                     </div>
                 </section>
 
+                {/* why choose us section. It highlights the benefits of using the pet adoption platform and encourages users to join the community. */}
                 <section className="mx-auto max-w-7xl px-8 pb-24">
                     <div className="rounded-[28px] bg-[#1f5c3f] px-8 py-12 text-white">
                         <h2 className="text-3xl font-semibold">Why Choose Us?</h2>
@@ -167,6 +179,7 @@ function Home() {
                     </div>
                 </section>
 
+                {/* footer section with contact information, quick links, and a brief description of the pet adoption platform. */}
                 <Footer />
 
             </div>

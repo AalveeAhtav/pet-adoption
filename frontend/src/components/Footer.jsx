@@ -1,3 +1,5 @@
+//footer for bottom of the page
+
 function Footer() {
   return (
     <footer className="bg-[#123826] text-white">

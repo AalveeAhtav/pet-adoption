@@ -1,3 +1,5 @@
+//search card component for filtering pets based on location, pet type, gender, and age. It includes dropdowns for each filter and a search button to apply the filters.
+
 function SearchCard() {
     return(
         <div className="rounded-[28px] bg-white p-8 shadow-[0_20px_50px_rgba(0,0,0,0.12)]">
