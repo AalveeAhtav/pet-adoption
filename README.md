@@ -1,11 +1,19 @@
-#setup:
-clone the project: git clone https://github.com/AalveeAhtav/pet-adoption
-cd pet-adoption
+# Setup
 
-#if you are working frontend:
+## Clone the project
+```bash
+git clone https://github.com/AalveeAhtav/pet-adoption
+cd pet-adoption
+```
+
+## If you are working on the frontend
+```bash
 cd frontend
 npm install
 npm run dev
+```
 
-#if you are working backend:
+## If you are working on the backend
+```bash
 cd backend
+```
