@@ -1,5 +1,6 @@
 # how to setup the frontend:
 first clone the git repo:- git clone https://github.com/AalveeAhtav/pet-adoption
+cd pet-adoption
 cd frontend
 npm install
 
