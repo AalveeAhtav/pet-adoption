@@ -62,7 +62,7 @@ function Home() {
             },
         ];
 
-    //steps for the adoption process
+    //steps for the adoption and foster process
     const adoptionSteps = [
             {
             number: "01",
@@ -76,8 +76,8 @@ function Home() {
             },
             {
             number: "03",
-            title: "Start Adopting",
-            text: "Submit your application and begin the adoption process with confidence.",
+            title: "Start Applying",
+            text: "Submit your application and begin the adoption or foster process with confidence.",
             },
         ];
 
@@ -157,10 +157,10 @@ function Home() {
                                 </button>
 
                                 <button
-                                    onClick={() => navigate("/pets?purpose=adoption")}
+                                    onClick={() => navigate("/pets")}
                                     className="rounded-2xl border border-white px-6 py-3 font-medium text-white hover:bg-white hover:text-[#1f5c3f] cursor-pointer"
                                 >
-                                    Start Adopting
+                                    Start Adopting/Fostering
                                 </button>
                             </div>
                         </div>
@@ -234,7 +234,7 @@ function Home() {
 
                 {/* adoption steps section. It explains the steps involved in the adoption process with descriptions. */}
                 <section className="mx-auto max-w-7xl px-8 pb-24">
-                    <h2 className="text-3xl font-semibold">How Adoption Works</h2>
+                    <h2 className="text-3xl font-semibold">How Adoption/Foster Works</h2>
 
                     <div className="mt-10 grid gap-6 md:grid-cols-3">
                         {adoptionSteps.map((step) => (
@@ -258,7 +258,7 @@ function Home() {
                     <div className="rounded-[28px] bg-[#1f5c3f] px-8 py-12 text-white">
                         <h2 className="text-3xl font-semibold">Why Choose Us?</h2>
                         <p className="mt-4 max-w-6xl leading-8 text-white/85">
-                            We are dedicated to connecting loving homes with pets in need. Our platform offers a wide variety of adoptable pets, easy-to-use search filters, and a supportive adoption process. Join our community of pet lovers and give a deserving pet a forever home today!
+                            We are dedicated to connecting loving homes with pets in need. Our platform offers a wide variety of adoptable pets, easy-to-use search filters, and a supportive adoption and foster process. Join our community of pet lovers and give a deserving pet a forever home today!
                         </p>
                     </div>
                 </section>

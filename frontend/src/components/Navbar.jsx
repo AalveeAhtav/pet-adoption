@@ -39,7 +39,7 @@ function Navbar() {
                         )}
                     </NavLink>
 
-                    {/* Adopt */}
+                    {/* Adopt/Foster */}
                     <div className="relative group">
                         <NavLink
                             to="/pets"
@@ -53,7 +53,7 @@ function Navbar() {
                         >
                             {({ isActive }) => (
                                 <>
-                                    Adopt
+                                    Adopt/Foster
                                     <span
                                         className={`absolute left-0 -bottom-1 h-[2px] w-full bg-[#1f5c3f] origin-left transition-transform duration-300 ${
                                             isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
@@ -75,34 +75,11 @@ function Navbar() {
                                 to="/login"
                                 className="block rounded-lg px-4 py-3 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-[#1f5c3f]"
                             >
-                                Your adoption applications
+                                Your applications
                                 <span className="ml-2 text-xs text-gray-400">(log in required)</span>
                             </Link>
                         </div>
                     </div>
-
-                    {/* Foster */}
-                    <NavLink
-                        to="/foster"
-                        className={({ isActive }) =>
-                            `group relative transition-colors duration-200 ${
-                                isActive
-                                    ? "text-[#1f5c3f]"
-                                    : "text-gray-600 hover:text-[#1f5c3f]"
-                            }`
-                        }
-                    >
-                        {({ isActive }) => (
-                            <>
-                                Foster
-                                <span
-                                    className={`absolute left-0 -bottom-1 h-[2px] w-full bg-[#1f5c3f] origin-left transition-transform duration-300 ${
-                                        isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                                    }`}
-                                ></span>
-                            </>
-                        )}
-                    </NavLink>
 
                     {/* About */}
                     <NavLink
