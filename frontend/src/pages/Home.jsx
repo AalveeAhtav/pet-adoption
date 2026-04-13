@@ -456,7 +456,7 @@ function Home() {
                                 setSelectedPet(null);
                                 setIsEditingPet(false);
                             }}
-                            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-2xl text-gray-600 shadow-md hover:bg-gray-100 cursor-pointer"
+                            className="absolute right-2 top-2 flex h-10 w-10 items-center justify-center rounded-full bg-white text-2xl text-gray-600 shadow-md hover:bg-gray-100 cursor-pointer"
                         >
                             ×
                         </button>

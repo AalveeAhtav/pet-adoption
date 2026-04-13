@@ -242,7 +242,6 @@ function AddPet() {
                             <option value="">Select purpose</option>
                             <option value="adoption">Adoption</option>
                             <option value="foster">Foster</option>
-                            <option value="adoption/foster">Adoption/Foster</option>
                         </select>
 
                         <textarea
