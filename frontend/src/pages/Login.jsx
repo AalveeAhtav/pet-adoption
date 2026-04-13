@@ -1,7 +1,44 @@
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
+    const [formData, setFormData] = useState({
+        identifier: "",
+        password: "",
+        rememberMe: false,
+    });
+
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    /* send user back to the page they were trying to visit before login */
+    const from = location.state?.from?.pathname || "/";
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+
+        setFormData({
+            ...formData,
+            [name]: type === "checkbox" ? checked : value,
+        });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        /* fake login for now through auth context */
+        const didLogin = login(formData.identifier, formData.password);
+
+        /* after login, return user to the protected page they wanted */
+        if (didLogin) {
+            navigate(from, { replace: true });
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#f8f8f6] text-[#1f1f1f]">
             <Navbar />
@@ -17,19 +54,23 @@ function Login() {
                         </p>
                     </div>
 
-                    <form className="mt-8 space-y-5">
+                    <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                         <div>
                             <label
-                                htmlFor="email"
+                                htmlFor="identifier"
                                 className="mb-2 block text-sm font-medium text-[#1f1f1f]"
                             >
-                                Email Address
+                                Email or Username
                             </label>
                             <input
-                                id="email"
-                                type="email"
-                                placeholder="Enter your email"
+                                id="identifier"
+                                name="identifier"
+                                type="text"
+                                value={formData.identifier}
+                                onChange={handleChange}
+                                placeholder="Enter your email or username"
                                 className="w-full rounded-2xl border border-gray-200 bg-[#f8f8f6] px-4 py-3 outline-none transition focus:border-[#1f5c3f] focus:ring-2 focus:ring-[#1f5c3f]/20"
+                                required
                             />
                         </div>
 
@@ -42,15 +83,25 @@ function Login() {
                             </label>
                             <input
                                 id="password"
+                                name="password"
                                 type="password"
+                                value={formData.password}
+                                onChange={handleChange}
                                 placeholder="Enter your password"
                                 className="w-full rounded-2xl border border-gray-200 bg-[#f8f8f6] px-4 py-3 outline-none transition focus:border-[#1f5c3f] focus:ring-2 focus:ring-[#1f5c3f]/20"
+                                required
                             />
                         </div>
 
                         <div className="flex items-center justify-between text-sm">
                             <label className="flex items-center gap-2 text-gray-600">
-                                <input type="checkbox" className="accent-[#1f5c3f]" />
+                                <input
+                                    type="checkbox"
+                                    name="rememberMe"
+                                    checked={formData.rememberMe}
+                                    onChange={handleChange}
+                                    className="accent-[#1f5c3f]"
+                                />
                                 Remember me
                             </label>
 
@@ -70,14 +121,23 @@ function Login() {
                         </button>
                     </form>
 
+                    <div className="mt-6 rounded-2xl bg-[#f7f7f3] px-4 py-3 text-sm text-gray-600">
+                        <p className="font-medium text-[#123826]">Demo logins</p>
+                        <p className="mt-2">User: <span className="font-medium">user</span> or <span className="font-medium">test@example.com</span></p>
+                        <p>Password: <span className="font-medium">1234</span></p>
+                        <p className="mt-2">Admin: <span className="font-medium">admin</span> or <span className="font-medium">admin@petadoption.com</span></p>
+                        <p>Password: <span className="font-medium">admin123</span></p>
+                    </div>
+
+                    {/* redirect */}
                     <p className="mt-6 text-center text-sm text-gray-600">
                         Don’t have an account?{" "}
-                        <a
-                            href="#"
+                        <Link
+                            to="/signup"
                             className="font-medium text-[#1f5c3f] hover:text-[#174a32]"
                         >
                             Sign up
-                        </a>
+                        </Link>
                     </p>
                 </div>
             </main>

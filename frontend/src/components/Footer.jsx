@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 //footer for bottom of the page
 
 function Footer() {
@@ -15,9 +16,14 @@ function Footer() {
                 <h4 className="text-lg font-semibold"> Quick Links</h4>
                 <ul className="mt-4 space-y-2 text-white/60">
                     <li><a href="#" className="transition-all duration-200 hover:text-white hover:translate-x-1">Home</a></li>
-                    <li><a href="#" className="transition-all duration-200 hover:text-white hover:translate-x-1">Adopt</a></li>
-                    <li><a href="#" className="transition-all duration-200 hover:text-white hover:translate-x-1">Foster</a></li>
-                    <li><a href="#" className="transition-all duration-200 hover:text-white hover:translate-x-1">About Us</a></li>
+                    <li>
+                        <Link 
+                            to="/pets" 
+                            className="transition-all duration-200 hover:text-white hover:translate-x-1"
+                        >
+                            Adopt/Foster
+                        </Link>
+                    </li>
                 </ul>
             </div>
 

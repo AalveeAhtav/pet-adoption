@@ -1,14 +1,17 @@
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import SearchCard from "../components/SearchCard";
 import Footer from "../components/Footer";
+import { useAuth } from "../context/AuthContext";
 
 function BrowsePets() {
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const { user } = useAuth();
 
     //dummy pet data for now, replace it with database later
-    const availablePets = [
+    const defaultPets = [
         {
             id: 1,
             name: "Max",
@@ -107,6 +110,28 @@ function BrowsePets() {
         },
     ];
 
+    //state for all available pets loaded from localStorage or default data
+    const [availablePets, setAvailablePets] = useState([]);
+
+    useEffect(() => {
+        const storedPets = JSON.parse(localStorage.getItem("pets")) || [];
+
+        const mergedPets = [...defaultPets];
+
+        storedPets.forEach((storedPet) => {
+            const alreadyExists = mergedPets.some(
+                (pet) => Number(pet.id) === Number(storedPet.id)
+            );
+
+            if (!alreadyExists) {
+                mergedPets.push(storedPet);
+            }
+        });
+
+        localStorage.setItem("pets", JSON.stringify(mergedPets));
+        setAvailablePets(mergedPets);
+    }, []);
+
     //state for the current filter values inside the search card
     const [filters, setFilters] = useState({
         location: searchParams.get("location") || "",
@@ -127,6 +152,22 @@ function BrowsePets() {
 
     //state for the currently selected pet when the user clicks view details
     const [selectedPet, setSelectedPet] = useState(null);
+
+    //state for admin edit mode inside the pet modal
+    const [isEditingPet, setIsEditingPet] = useState(false);
+
+    //state for the editable pet form fields
+    const [editFormData, setEditFormData] = useState({
+        name: "",
+        breed: "",
+        type: "",
+        age: "",
+        gender: "",
+        location: "",
+        image: "",
+        purpose: "",
+        description: "",
+    });
 
     //handles changes in the search card dropdowns
     function handleFilterChange(event) {
@@ -156,6 +197,98 @@ function BrowsePets() {
         return 0;
     }
 
+    //opens the modal with the selected pet
+    function handleOpenPetDetails(pet) {
+        setSelectedPet(pet);
+        setIsEditingPet(false);
+        setEditFormData({
+            name: pet.name,
+            breed: pet.breed,
+            type: pet.type,
+            age: pet.age,
+            gender: pet.gender,
+            location: pet.location,
+            image: pet.image,
+            purpose: pet.purpose,
+            description: pet.description,
+        });
+    }
+
+    //handles changes in the admin edit pet form
+    function handleEditFormChange(event) {
+        const { name, value } = event.target;
+        setEditFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: value,
+        }));
+    }
+
+    //saves the edited pet and updates localStorage
+    function handleSavePetEdits() {
+        if (!selectedPet) {
+            return;
+        }
+
+        const updatedPets = availablePets.map((pet) =>
+            Number(pet.id) === Number(selectedPet.id)
+                ? { ...pet, ...editFormData }
+                : pet
+        );
+
+        const updatedSelectedPet = updatedPets.find(
+            (pet) => Number(pet.id) === Number(selectedPet.id)
+        );
+
+        setAvailablePets(updatedPets);
+        localStorage.setItem("pets", JSON.stringify(updatedPets));
+        setSelectedPet(updatedSelectedPet);
+        setIsEditingPet(false);
+    }
+
+    //navigates to the correct application page based on whether the pet is for adoption or foster
+    function handleApplyClick(pet) {
+        if (pet.purpose === "adoption") {
+            navigate(`/apply-adoption/${pet.id}`, {
+                state: pet,
+            });
+        } else {
+            navigate(`/apply-foster/${pet.id}`, {
+                state: pet,
+            });
+        }
+
+        setSelectedPet(null);
+        setIsEditingPet(false);
+    }
+
+    //handles deleting a pet for admins only and also removes any related applications
+    function handleDeletePet(petId) {
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this pet? This will also remove related applications."
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const updatedPets = availablePets.filter(
+            (pet) => Number(pet.id) !== Number(petId)
+        );
+
+        const existingApplications =
+            JSON.parse(localStorage.getItem("applications")) || [];
+
+        const updatedApplications = existingApplications.filter(
+            (application) => Number(application.petId) !== Number(petId)
+        );
+
+        setAvailablePets(updatedPets);
+        localStorage.setItem("pets", JSON.stringify(updatedPets));
+        localStorage.setItem("applications", JSON.stringify(updatedApplications));
+        setSelectedPet(null);
+        setIsEditingPet(false);
+    }
+
     //filters the pets based on the selected search values
     const filteredPets = availablePets.filter((pet) => {
         const petAgeInYears = getPetAgeInYears(pet.age);
@@ -163,7 +296,7 @@ function BrowsePets() {
         const matchesLocation =
             appliedFilters.location === "" ||
             appliedFilters.location === "any" ||
-            pet.location.toLowerCase().includes(appliedFilters.location);
+            pet.location.toLowerCase().includes(appliedFilters.location.toLowerCase());
 
         const matchesType =
             appliedFilters.type === "" ||
@@ -249,12 +382,12 @@ function BrowsePets() {
                                         {pet.gender}
                                     </span>
                                     <span className="whitespace-nowrap rounded-full bg-[#e8f1ec] px-2.5 py-1 text-xs font-medium text-[#1f5c3f]">
-                                        {pet.purpose === "adoption" ? "Adoption" : "Foster"}
+                                        {pet.purpose === "adoption" ? "Adoption" : pet.purpose === "foster" ? "Foster" : "Adoption/Foster"}
                                     </span>
                                 </div>
 
                                 <button
-                                    onClick={() => setSelectedPet(pet)}
+                                    onClick={() => handleOpenPetDetails(pet)}
                                     className="mt-4 w-full rounded-xl bg-[#1f5c3f] py-3 font-medium text-white transition hover:bg-[#174a32] cursor-pointer"
                                 >
                                     View Details
@@ -271,56 +404,198 @@ function BrowsePets() {
                     <div className="relative w-full max-w-2xl animate-[modalPop_0.25s_ease-out] rounded-[28px] bg-white p-6 shadow-2xl md:p-8">
 
                         <button
-                            onClick={() => setSelectedPet(null)}
+                            onClick={() => {
+                                setSelectedPet(null);
+                                setIsEditingPet(false);
+                            }}
                             className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-2xl text-gray-600 shadow-md hover:bg-gray-100 cursor-pointer"
                         >
                             ×
                         </button>
 
-                        <img
-                            src={selectedPet.image}
-                            alt={selectedPet.name}
-                            className="mt-4 h-72 w-full rounded-[20px] object-cover"
-                        />
+                        {isEditingPet ? (
+                            <div className="mt-4">
+                                <h3 className="text-3xl font-semibold text-[#123826]">
+                                    Edit Pet
+                                </h3>
 
-                        <div className="mt-6">
-                            <div className="flex flex-wrap items-center gap-3">
-                                <h3 className="text-3xl font-semibold">{selectedPet.name}</h3>
-                                <span className="rounded-full bg-[#e8f1ec] px-3 py-1 text-sm font-medium text-[#1f5c3f]">
-                                    {selectedPet.purpose === "adoption" ? "Adoption" : "Foster"}
-                                </span>
+                                <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={editFormData.name}
+                                        onChange={handleEditFormChange}
+                                        placeholder="Pet name"
+                                        className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826]"
+                                    />
+
+                                    <input
+                                        type="text"
+                                        name="breed"
+                                        value={editFormData.breed}
+                                        onChange={handleEditFormChange}
+                                        placeholder="Breed"
+                                        className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826]"
+                                    />
+
+                                    <select
+                                        name="type"
+                                        value={editFormData.type}
+                                        onChange={handleEditFormChange}
+                                        className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826]"
+                                    >
+                                        <option value="dog">Dog</option>
+                                        <option value="cat">Cat</option>
+                                        <option value="other">Other</option>
+                                    </select>
+
+                                    <input
+                                        type="text"
+                                        name="age"
+                                        value={editFormData.age}
+                                        onChange={handleEditFormChange}
+                                        placeholder="Age"
+                                        className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826]"
+                                    />
+
+                                    <select
+                                        name="gender"
+                                        value={editFormData.gender}
+                                        onChange={handleEditFormChange}
+                                        className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826]"
+                                    >
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+
+                                    <input
+                                        type="text"
+                                        name="location"
+                                        value={editFormData.location}
+                                        onChange={handleEditFormChange}
+                                        placeholder="Location"
+                                        className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826]"
+                                    />
+
+                                    <input
+                                        type="text"
+                                        name="image"
+                                        value={editFormData.image}
+                                        onChange={handleEditFormChange}
+                                        placeholder="Image URL"
+                                        className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826] md:col-span-2"
+                                    />
+
+                                    <select
+                                        name="purpose"
+                                        value={editFormData.purpose}
+                                        onChange={handleEditFormChange}
+                                        className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826] md:col-span-2"
+                                    >
+                                        <option value="adoption">Adoption</option>
+                                        <option value="foster">Foster</option>
+                                        <option value="adoption/foster">Adoption/Foster</option>
+                                    </select>
+
+                                    <textarea
+                                        name="description"
+                                        value={editFormData.description}
+                                        onChange={handleEditFormChange}
+                                        rows="5"
+                                        placeholder="Description"
+                                        className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826] md:col-span-2"
+                                    />
+                                </div>
+
+                                <div className="mt-6 flex flex-col gap-3">
+                                    <button
+                                        onClick={handleSavePetEdits}
+                                        className="w-full rounded-xl bg-[#1f5c3f] py-3 font-medium text-white transition hover:bg-[#174a32] cursor-pointer"
+                                    >
+                                        Save Changes
+                                    </button>
+
+                                    <button
+                                        onClick={() => setIsEditingPet(false)}
+                                        className="w-full rounded-xl border border-gray-300 py-3 font-medium text-gray-700 transition hover:bg-gray-100 cursor-pointer"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
                             </div>
+                        ) : (
+                            <>
+                                <img
+                                    src={selectedPet.image}
+                                    alt={selectedPet.name}
+                                    className="mt-4 h-72 w-full rounded-[20px] object-cover"
+                                />
 
-                            <p className="mt-2 text-lg text-gray-500">{selectedPet.breed}</p>
+                                <div className="mt-6">
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <h3 className="text-3xl font-semibold">{selectedPet.name}</h3>
+                                        <span className="rounded-full bg-[#e8f1ec] px-3 py-1 text-sm font-medium text-[#1f5c3f]">
+                                            {selectedPet.purpose === "adoption" ? "Adoption" : selectedPet.purpose === "foster" ? "Foster" : "Adoption/Foster"}
+                                        </span>
+                                    </div>
 
-                            <div className="mt-4 flex flex-wrap gap-2">
-                                <span className="rounded-full bg-[#eef3ef] px-3 py-1 text-sm text-[#1f5c3f]">
-                                    {selectedPet.age}
-                                </span>
-                                <span className="rounded-full bg-[#f4f4f4] px-3 py-1 text-sm text-gray-600">
-                                    {selectedPet.gender}
-                                </span>
-                                <span className="rounded-full bg-[#f4f4f4] px-3 py-1 text-sm text-gray-600">
-                                    {selectedPet.location}
-                                </span>
-                            </div>
+                                    <p className="mt-2 text-lg text-gray-500">{selectedPet.breed}</p>
 
-                            <p className="mt-6 leading-7 text-gray-600">
-                                {selectedPet.description}
-                            </p>
+                                    <div className="mt-4 flex flex-wrap gap-2">
+                                        <span className="rounded-full bg-[#eef3ef] px-3 py-1 text-sm text-[#1f5c3f]">
+                                            {selectedPet.age}
+                                        </span>
+                                        <span className="rounded-full bg-[#f4f4f4] px-3 py-1 text-sm text-gray-600">
+                                            {selectedPet.gender}
+                                        </span>
+                                        <span className="rounded-full bg-[#f4f4f4] px-3 py-1 text-sm text-gray-600">
+                                            {selectedPet.location}
+                                        </span>
+                                    </div>
 
-                            <p className="mt-6 text-sm font-medium text-[#1f5c3f]">
-                                {selectedPet.purpose === "adoption"
-                                    ? "Available for Adoption"
-                                    : "Available for Foster"}
-                            </p>
+                                    <p className="mt-6 leading-7 text-gray-600">
+                                        {selectedPet.description}
+                                    </p>
 
-                            <button className="mt-4 w-full rounded-xl bg-[#1f5c3f] py-3 font-medium text-white transition hover:bg-[#174a32] cursor-pointer">
-                                {selectedPet.purpose === "adoption"
-                                    ? "Apply for Adoption"
-                                    : "Apply for Foster"}
-                            </button>
-                        </div>
+                                    <p className="mt-6 text-sm font-medium text-[#1f5c3f]">
+                                        {selectedPet.purpose === "adoption"
+                                            ? "Available for Adoption"
+                                            : selectedPet.purpose === "foster"
+                                            ? "Available for Foster"
+                                            : "Available for Adoption or Foster"}
+                                    </p>
+
+                                    <div className="mt-4 flex flex-col gap-3">
+                                        <button
+                                            onClick={() => handleApplyClick(selectedPet)}
+                                            className="w-full rounded-xl bg-[#1f5c3f] py-3 font-medium text-white transition hover:bg-[#174a32] cursor-pointer"
+                                        >
+                                            {selectedPet.purpose === "adoption"
+                                                ? "Apply for Adoption"
+                                                : "Apply for Foster"}
+                                        </button>
+
+                                        {user?.role === "admin" && (
+                                            <>
+                                                <button
+                                                    onClick={() => setIsEditingPet(true)}
+                                                    className="w-full rounded-xl border border-[#1f5c3f] bg-[#eef3ef] py-3 font-medium text-[#1f5c3f] transition hover:bg-[#e3ece6] cursor-pointer"
+                                                >
+                                                    Edit Pet
+                                                </button>
+
+                                                <button
+                                                    onClick={() => handleDeletePet(selectedPet.id)}
+                                                    className="w-full rounded-xl border border-red-200 bg-red-50 py-3 font-medium text-red-600 transition hover:bg-red-100 cursor-pointer"
+                                                >
+                                                    Delete Pet
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
@@ -30,6 +31,18 @@ function Signup() {
                             <input
                                 type="text"
                                 placeholder="Enter your full name"
+                                className="w-full rounded-2xl border border-gray-200 bg-[#f8f8f6] px-4 py-3 outline-none transition focus:border-[#1f5c3f] focus:ring-2 focus:ring-[#1f5c3f]/20"
+                            />
+                        </div>
+
+                        {/* User Name */}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">
+                                Username
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Enter your user name"
                                 className="w-full rounded-2xl border border-gray-200 bg-[#f8f8f6] px-4 py-3 outline-none transition focus:border-[#1f5c3f] focus:ring-2 focus:ring-[#1f5c3f]/20"
                             />
                         </div>
@@ -88,12 +101,12 @@ function Signup() {
                     {/* redirect */}
                     <p className="mt-6 text-center text-sm text-gray-600">
                         Already have an account?{" "}
-                        <a
-                            href="/login"
+                        <Link
+                            to="/login"
                             className="font-medium text-[#1f5c3f] hover:text-[#174a32]"
                         >
                             Log in
-                        </a>
+                        </Link>
                     </p>
                 </div>
             </main>
