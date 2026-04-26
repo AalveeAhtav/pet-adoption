@@ -37,3 +37,25 @@ If someone else is creating SQL/database, share this contract file with them:
 ```bash
 backend/DATABASE_CONTRACT.md
 ```
+
+## Backend skeleton setup
+```bash
+cd backend
+copy .env.example .env
+npm install
+npm run dev
+```
+
+Backend test endpoints:
+- `GET http://localhost:5000/api/health`
+- `GET http://localhost:5000/api/pets`
+- `GET http://localhost:5000/api/applications`
+
+## Frontend API config
+```bash
+cd frontend
+copy .env.example .env
+```
+
+The frontend can use:
+- `frontend/src/lib/apiClient.js`
