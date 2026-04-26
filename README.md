@@ -18,3 +18,22 @@ npm run dev
 mkdir backend (from project directory)
 cd backend
 ```
+
+## Team-managed MySQL + ports
+Use these ports for website + DB:
+
+- Frontend: `5173`
+- Backend API: `5000`
+- MySQL: `3306`
+
+Backend env template:
+
+```bash
+backend/.env.example
+```
+
+If someone else is creating SQL/database, share this contract file with them:
+
+```bash
+backend/DATABASE_CONTRACT.md
+```
