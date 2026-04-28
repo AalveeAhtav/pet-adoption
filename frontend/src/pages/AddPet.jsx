@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
+import apiClient from "../lib/apiClient";
 
 function AddPet() {
     const { user } = useAuth();
@@ -20,6 +21,8 @@ function AddPet() {
 
     const [uploadedImage, setUploadedImage] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
+    const [submitError, setSubmitError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -54,45 +57,51 @@ function AddPet() {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitError("");
 
         if (!user || user.role !== "admin") {
+            setSubmitError("Only admins can add pets.");
             return;
         }
 
-        const existingPets = JSON.parse(localStorage.getItem("pets")) || [];
+        try {
+            setIsSubmitting(true);
+            const { data } = await apiClient.post("/pets", {
+                name: formData.name,
+                breed: formData.breed,
+                type: formData.type,
+                age: Number(formData.age),
+                gender: formData.gender,
+                location: formData.location,
+                image: uploadedImage || formData.image,
+                purpose: formData.purpose,
+                description: formData.description,
+            });
 
-        let nextId = 1;
-        if (existingPets.length > 0) {
-            nextId =
-                Math.max(...existingPets.map((pet) => Number(pet.id) || 0)) + 1;
+            setSuccessMessage(`Pet added successfully (ID: ${data.petId}).`);
+            setFormData({
+                name: "",
+                breed: "",
+                type: "",
+                age: "",
+                gender: "",
+                location: "",
+                image: "",
+                purpose: "",
+                description: "",
+            });
+            setUploadedImage("");
+        } catch (error) {
+            setSubmitError(
+                error?.response?.data?.message ||
+                error?.response?.data?.details ||
+                "Failed to add pet. Please try again."
+            );
+        } finally {
+            setIsSubmitting(false);
         }
-
-        const newPet = {
-            id: nextId,
-            ...formData,
-            image: uploadedImage || formData.image,
-        };
-
-        const updatedPets = [...existingPets, newPet];
-        localStorage.setItem("pets", JSON.stringify(updatedPets));
-
-        setSuccessMessage("Pet added successfully.");
-
-        setFormData({
-            name: "",
-            breed: "",
-            type: "",
-            age: "",
-            gender: "",
-            location: "",
-            image: "",
-            purpose: "",
-            description: "",
-        });
-
-        setUploadedImage("");
     };
 
     return (
@@ -111,6 +120,11 @@ function AddPet() {
                     {successMessage && (
                         <div className="mt-6 rounded-2xl bg-green-50 px-4 py-3 text-green-700">
                             {successMessage}
+                        </div>
+                    )}
+                    {submitError && (
+                        <div className="mt-6 rounded-2xl bg-red-50 px-4 py-3 text-red-700">
+                            {submitError}
                         </div>
                     )}
 
@@ -256,9 +270,10 @@ function AddPet() {
 
                         <button
                             type="submit"
+                            disabled={isSubmitting}
                             className="rounded-xl bg-[#123826] px-6 py-3 font-medium text-white transition hover:opacity-90 md:col-span-2"
                         >
-                            Add Pet
+                            {isSubmitting ? "Adding..." : "Add Pet"}
                         </button>
                     </form>
                 </div>

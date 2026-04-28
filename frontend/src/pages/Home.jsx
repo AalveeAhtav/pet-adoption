@@ -7,6 +7,7 @@ import SearchCard from "../components/SearchCard";
 import Footer from "../components/Footer";
 import heroImage from "../assets/hero_cat.jpg";
 import { useAuth } from "../context/AuthContext";
+import apiClient from "../lib/apiClient";
 
 function Home() {
     const navigate = useNavigate();
@@ -124,22 +125,50 @@ function Home() {
     const [featuredPets, setFeaturedPets] = useState([]);
 
     useEffect(() => {
-        const storedPets = JSON.parse(localStorage.getItem("pets")) || [];
+        async function loadFeaturedPets() {
+            try {
+                const { data } = await apiClient.get("/pets");
+                const mappedPets = data.map((pet) => ({
+                    id: pet.pet_id,
+                    name: pet.pet_name,
+                    breed: pet.breed || "Unknown Breed",
+                    type: (pet.species || "other").toLowerCase(),
+                    age: pet.age !== null ? `${pet.age} Years` : "Unknown",
+                    gender: pet.gender || "Unknown",
+                    location: pet.shelter_location || "Shelter",
+                    purpose: (pet.purpose || "adoption").toLowerCase(),
+                    description:
+                        pet.profile_description ||
+                        `${pet.pet_name} is currently ${pet.status?.toLowerCase() || "available"} and looking for a home.`,
+                    image:
+                        pet.image_url ||
+                        "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=800&q=80",
+                }));
 
-        const mergedPets = [...defaultPets];
-
-        storedPets.forEach((storedPet) => {
-            const alreadyExists = mergedPets.some(
-                (pet) => Number(pet.id) === Number(storedPet.id)
-            );
-
-            if (!alreadyExists) {
-                mergedPets.push(storedPet);
+                setFeaturedPets(mappedPets.slice(0, 4));
+                return;
+            } catch (_error) {
+                // fall back to default/home demo cards only if backend is unavailable
             }
-        });
 
-        localStorage.setItem("pets", JSON.stringify(mergedPets));
-        setFeaturedPets(mergedPets.slice(0, 4));
+            const storedPets = JSON.parse(localStorage.getItem("pets")) || [];
+            const mergedPets = [...defaultPets];
+
+            storedPets.forEach((storedPet) => {
+                const alreadyExists = mergedPets.some(
+                    (pet) => Number(pet.id) === Number(storedPet.id)
+                );
+
+                if (!alreadyExists) {
+                    mergedPets.push(storedPet);
+                }
+            });
+
+            localStorage.setItem("pets", JSON.stringify(mergedPets));
+            setFeaturedPets(mergedPets.slice(0, 4));
+        }
+
+        loadFeaturedPets();
     }, []);
 
     //steps for the adoption and foster process

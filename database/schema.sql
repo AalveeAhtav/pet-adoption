@@ -9,6 +9,11 @@ CREATE TABLE Pet (
     age INT(2) DEFAULT NULL,
     arrivalDate DATE NOT NULL,
     status CHAR(10) DEFAULT 'Sheltered',
+    gender VARCHAR(20) NOT NULL DEFAULT 'Unknown',
+    shelterLocation VARCHAR(100) NOT NULL DEFAULT 'Shelter',
+    imageUrl MEDIUMTEXT,
+    purpose VARCHAR(20) NOT NULL DEFAULT 'adoption',
+    profileDescription MEDIUMTEXT,
 
     PRIMARY KEY (petID)
 );
@@ -31,6 +36,7 @@ CREATE TABLE AppliesForAdoption (
     petID INT(6) NOT NULL,
     customerID INT(6) NOT NULL,
     status CHAR(10) DEFAULT 'Pending',
+    applicationType CHAR(10) NOT NULL DEFAULT 'adoption',
 
     PRIMARY KEY (applicationID),
 

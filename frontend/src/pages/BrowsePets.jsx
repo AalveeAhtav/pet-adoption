@@ -125,18 +125,21 @@ function BrowsePets() {
                     breed: pet.breed || "Unknown Breed",
                     type: (pet.species || "other").toLowerCase(),
                     age: pet.age !== null ? `${pet.age} Years` : "Unknown",
-                    gender: "Unknown",
-                    location: "Shelter",
+                    gender: pet.gender || "Unknown",
+                    location: pet.shelter_location || "Shelter",
                     image:
+                        pet.image_url ||
                         "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=800&q=80",
-                    purpose: "adoption",
-                    description: `${pet.pet_name} is currently ${pet.status?.toLowerCase() || "available"} and looking for a home.`,
+                    purpose: (pet.purpose || "adoption").toLowerCase(),
+                    description:
+                        pet.profile_description ||
+                        `${pet.pet_name} is currently ${pet.status?.toLowerCase() || "available"} and looking for a home.`,
                 }));
 
-                if (mappedPets.length > 0) {
-                    setAvailablePets(mappedPets);
-                    return;
-                }
+                // If backend responds successfully, trust DB as source of truth
+                // even when there are no pets yet.
+                setAvailablePets(mappedPets);
+                return;
             } catch (_error) {
                 // Fall back to demo data if backend is unavailable.
             }
@@ -252,26 +255,44 @@ function BrowsePets() {
         }));
     }
 
-    //saves the edited pet and updates localStorage
-    function handleSavePetEdits() {
+    // saves the edited pet to backend and updates UI state
+    async function handleSavePetEdits() {
         if (!selectedPet) {
             return;
         }
 
-        const updatedPets = availablePets.map((pet) =>
-            Number(pet.id) === Number(selectedPet.id)
-                ? { ...pet, ...editFormData }
-                : pet
-        );
+        try {
+            await apiClient.patch(`/pets/${selectedPet.id}`, {
+                name: editFormData.name,
+                breed: editFormData.breed,
+                type: editFormData.type,
+                age: Number.parseInt(editFormData.age, 10),
+                gender: editFormData.gender,
+                location: editFormData.location,
+                image: editFormData.image,
+                purpose: editFormData.purpose,
+                description: editFormData.description,
+            });
 
-        const updatedSelectedPet = updatedPets.find(
-            (pet) => Number(pet.id) === Number(selectedPet.id)
-        );
+            const updatedPets = availablePets.map((pet) =>
+                Number(pet.id) === Number(selectedPet.id)
+                    ? { ...pet, ...editFormData }
+                    : pet
+            );
 
-        setAvailablePets(updatedPets);
-        localStorage.setItem("pets", JSON.stringify(updatedPets));
-        setSelectedPet(updatedSelectedPet);
-        setIsEditingPet(false);
+            const updatedSelectedPet = updatedPets.find(
+                (pet) => Number(pet.id) === Number(selectedPet.id)
+            );
+
+            setAvailablePets(updatedPets);
+            setSelectedPet(updatedSelectedPet);
+            setIsEditingPet(false);
+        } catch (error) {
+            const message =
+                error?.response?.data?.message ||
+                "Unable to update pet right now. Please try again.";
+            window.alert(message);
+        }
     }
 
     //navigates to the correct application page based on whether the pet is for adoption or foster
@@ -291,7 +312,7 @@ function BrowsePets() {
     }
 
     //handles deleting a pet for admins only and also removes any related applications
-    function handleDeletePet(petId) {
+    async function handleDeletePet(petId) {
         const confirmed = window.confirm(
             "Are you sure you want to delete this pet? This will also remove related applications."
         );
@@ -300,22 +321,20 @@ function BrowsePets() {
             return;
         }
 
-        const updatedPets = availablePets.filter(
-            (pet) => Number(pet.id) !== Number(petId)
-        );
-
-        const existingApplications =
-            JSON.parse(localStorage.getItem("applications")) || [];
-
-        const updatedApplications = existingApplications.filter(
-            (application) => Number(application.petId) !== Number(petId)
-        );
-
-        setAvailablePets(updatedPets);
-        localStorage.setItem("pets", JSON.stringify(updatedPets));
-        localStorage.setItem("applications", JSON.stringify(updatedApplications));
-        setSelectedPet(null);
-        setIsEditingPet(false);
+        try {
+            await apiClient.delete(`/pets/${petId}`);
+            const updatedPets = availablePets.filter(
+                (pet) => Number(pet.id) !== Number(petId)
+            );
+            setAvailablePets(updatedPets);
+            setSelectedPet(null);
+            setIsEditingPet(false);
+        } catch (error) {
+            const message =
+                error?.response?.data?.message ||
+                "Unable to delete pet right now. Please try again.";
+            window.alert(message);
+        }
     }
 
     //filters the pets based on the selected search values

@@ -1,44 +1,71 @@
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import apiClient from "../lib/apiClient";
 
 function ViewAllApplications() {
     // selected type admin wants to view first
     const [selectedType, setSelectedType] = useState("");
 
-    // load all submitted applications from localStorage
-    const [applications, setApplications] = useState(() => {
-        return JSON.parse(localStorage.getItem("applications")) || [];
-    });
+    const [applications, setApplications] = useState([]);
 
-    // keep admin page in sync with latest localStorage data
     useEffect(() => {
-        const savedApplications =
-            JSON.parse(localStorage.getItem("applications")) || [];
-        setApplications(savedApplications);
-    }, [selectedType]);
+        async function loadApplications() {
+            try {
+                const { data } = await apiClient.get("/applications");
+                const mappedApplications = data.map((application) => ({
+                    id: application.application_id,
+                    type: application.application_type || "adoption",
+                    petName: application.pet_name,
+                    petBreed: "From shelter records",
+                    customerName: `${application.customer_fname} ${application.customer_lname}`.trim(),
+                    customerId: application.customer_id,
+                    customerEmail: application.customer_email,
+                    address: "N/A",
+                    submittedDate: `Application #${application.application_id}`,
+                    notes:
+                        application.status === "Approved"
+                            ? "Your application has been approved by the admin."
+                            : application.status === "Rejected"
+                              ? "Your application has been rejected by the admin."
+                              : "Awaiting admin review.",
+                    status: application.status,
+                }));
+                setApplications(mappedApplications);
+            } catch (_error) {
+                setApplications([]);
+            }
+        }
+
+        loadApplications();
+    }, []);
 
     // handles approving or rejecting an application
-    function handleUpdateStatus(applicationId, newStatus) {
-        const allApplications = JSON.parse(localStorage.getItem("applications")) || [];
-
-        const updatedApplications = allApplications.map((application) => {
-            if (application.id !== applicationId) {
-                return application;
-            }
-
-            return {
-                ...application,
+    async function handleUpdateStatus(applicationId, newStatus) {
+        try {
+            await apiClient.patch(`/applications/${applicationId}/status`, {
                 status: newStatus,
-                notes:
-                    newStatus === "Approved"
-                        ? "Your application has been approved by the admin."
-                        : "Your application has been rejected by the admin.",
-            };
-        });
+            });
 
-        setApplications(updatedApplications);
-        localStorage.setItem("applications", JSON.stringify(updatedApplications));
+            const updatedApplications = applications.map((application) => {
+                if (application.id !== applicationId) {
+                    return application;
+                }
+
+                return {
+                    ...application,
+                    status: newStatus,
+                    notes:
+                        newStatus === "Approved"
+                            ? "Your application has been approved by the admin."
+                            : "Your application has been rejected by the admin.",
+                };
+            });
+
+            setApplications(updatedApplications);
+        } catch (_error) {
+            window.alert("Unable to update status right now. Please try again.");
+        }
     }
 
     // filter applications based on selected type
@@ -236,15 +263,35 @@ function ViewAllApplications() {
                                             )}
 
                                             {application.status === "Approved" && (
-                                                <span className="text-sm font-medium text-green-700">
-                                                    This application has been accepted.
-                                                </span>
+                                                <>
+                                                    <span className="text-sm font-medium text-green-700">
+                                                        This application has been accepted.
+                                                    </span>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleUpdateStatus(application.id, "Pending")
+                                                        }
+                                                        className="rounded-xl border border-yellow-300 bg-yellow-50 px-5 py-2.5 text-sm font-medium text-yellow-700 transition hover:bg-yellow-100"
+                                                    >
+                                                        Reopen
+                                                    </button>
+                                                </>
                                             )}
 
                                             {application.status === "Rejected" && (
-                                                <span className="text-sm font-medium text-red-700">
-                                                    This application has been rejected.
-                                                </span>
+                                                <>
+                                                    <span className="text-sm font-medium text-red-700">
+                                                        This application has been rejected.
+                                                    </span>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleUpdateStatus(application.id, "Pending")
+                                                        }
+                                                        className="rounded-xl border border-yellow-300 bg-yellow-50 px-5 py-2.5 text-sm font-medium text-yellow-700 transition hover:bg-yellow-100"
+                                                    >
+                                                        Reopen
+                                                    </button>
+                                                </>
                                             )}
                                         </div>
                                     </div>

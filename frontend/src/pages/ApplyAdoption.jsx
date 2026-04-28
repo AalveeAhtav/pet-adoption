@@ -45,6 +45,8 @@ function ApplyAdoption() {
             await apiClient.post("/applications/adoption", {
                 petId: Number(formData.petId),
                 customerId: Number(formData.customerId),
+                fullName: formData.fullName,
+                email: formData.email,
             });
 
             setSubmitted(true);
