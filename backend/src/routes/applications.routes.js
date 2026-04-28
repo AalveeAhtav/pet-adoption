@@ -13,22 +13,10 @@ router.post("/adoption", async (req, res) => {
     }
 
     try {
-        const [statusRows] = await pool.query(
-            "SELECT status_id FROM application_status WHERE status_name = 'Pending' LIMIT 1"
-        );
-
-        if (!statusRows.length) {
-            return res.status(500).json({
-                message: "Missing required status row: Pending",
-            });
-        }
-
-        const pendingStatusId = statusRows[0].status_id;
-
         const [result] = await pool.query(
-            `INSERT INTO applies_for_adoption (pet_id, customer_id, status_id)
-             VALUES (?, ?, ?)`,
-            [petId, customerId, pendingStatusId]
+            `INSERT INTO AppliesForAdoption (petID, customerID, status)
+             VALUES (?, ?, 'Pending')`,
+            [petId, customerId]
         );
 
         return res.status(201).json({
@@ -47,14 +35,18 @@ router.get("/", async (_req, res) => {
     try {
         const [rows] = await pool.query(
             `SELECT
-                a.application_id,
-                a.pet_id,
-                a.customer_id,
-                s.status_name,
-                a.applied_at
-             FROM applies_for_adoption a
-             INNER JOIN application_status s ON s.status_id = a.status_id
-             ORDER BY a.application_id DESC`
+                a.applicationID AS application_id,
+                a.petID AS pet_id,
+                a.customerID AS customer_id,
+                a.status,
+                p.petName AS pet_name,
+                c.Fname AS customer_fname,
+                c.Lname AS customer_lname,
+                c.email AS customer_email
+             FROM AppliesForAdoption a
+             INNER JOIN Pet p ON p.petID = a.petID
+             INNER JOIN Customer c ON c.customerID = a.customerID
+             ORDER BY a.applicationID DESC`
         );
 
         res.status(200).json(rows);

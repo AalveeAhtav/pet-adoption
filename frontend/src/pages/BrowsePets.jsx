@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import SearchCard from "../components/SearchCard";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
+import apiClient from "../lib/apiClient";
 
 function BrowsePets() {
     const navigate = useNavigate();
@@ -114,22 +115,50 @@ function BrowsePets() {
     const [availablePets, setAvailablePets] = useState([]);
 
     useEffect(() => {
-        const storedPets = JSON.parse(localStorage.getItem("pets")) || [];
+        async function loadPets() {
+            try {
+                const { data } = await apiClient.get("/pets");
 
-        const mergedPets = [...defaultPets];
+                const mappedPets = data.map((pet) => ({
+                    id: pet.pet_id,
+                    name: pet.pet_name,
+                    breed: pet.breed || "Unknown Breed",
+                    type: (pet.species || "other").toLowerCase(),
+                    age: pet.age !== null ? `${pet.age} Years` : "Unknown",
+                    gender: "Unknown",
+                    location: "Shelter",
+                    image:
+                        "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=800&q=80",
+                    purpose: "adoption",
+                    description: `${pet.pet_name} is currently ${pet.status?.toLowerCase() || "available"} and looking for a home.`,
+                }));
 
-        storedPets.forEach((storedPet) => {
-            const alreadyExists = mergedPets.some(
-                (pet) => Number(pet.id) === Number(storedPet.id)
-            );
-
-            if (!alreadyExists) {
-                mergedPets.push(storedPet);
+                if (mappedPets.length > 0) {
+                    setAvailablePets(mappedPets);
+                    return;
+                }
+            } catch (_error) {
+                // Fall back to demo data if backend is unavailable.
             }
-        });
 
-        localStorage.setItem("pets", JSON.stringify(mergedPets));
-        setAvailablePets(mergedPets);
+            const storedPets = JSON.parse(localStorage.getItem("pets")) || [];
+            const mergedPets = [...defaultPets];
+
+            storedPets.forEach((storedPet) => {
+                const alreadyExists = mergedPets.some(
+                    (pet) => Number(pet.id) === Number(storedPet.id)
+                );
+
+                if (!alreadyExists) {
+                    mergedPets.push(storedPet);
+                }
+            });
+
+            localStorage.setItem("pets", JSON.stringify(mergedPets));
+            setAvailablePets(mergedPets);
+        }
+
+        loadPets();
     }, []);
 
     //state for the current filter values inside the search card

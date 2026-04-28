@@ -1,6 +1,7 @@
 import { Link, useParams, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import apiClient from "../lib/apiClient";
 
 function ApplyAdoption() {
     const { petId } = useParams();
@@ -17,6 +18,8 @@ function ApplyAdoption() {
     });
 
     const [submitted, setSubmitted] = useState(false);
+    const [submitError, setSubmitError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const location = useLocation();
     const pet = location.state;
@@ -28,42 +31,32 @@ function ApplyAdoption() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitError("");
 
-        const existingApplications =
-            JSON.parse(localStorage.getItem("applications")) || [];
+        if (!formData.customerId) {
+            setSubmitError("Missing customer ID. Please log in with a valid account.");
+            return;
+        }
 
-        const applicationData = {
-            id: Date.now(),
-            type: "adoption",
-            petId: formData.petId,
-            customerId: formData.customerId,
-            customerName: formData.fullName,
-            customerEmail: formData.email,
-            fullName: formData.fullName,
-            email: formData.email,
-            petName: pet?.name || `Pet #${formData.petId}`,
-            petBreed: pet?.breed || "Unknown Breed",
-            submittedDate: new Date().toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            }),
-            notes: "Application received successfully.",
-            status: "Pending",
-            reason: formData.reason,
-            housing: formData.housing,
-            address: formData.address,
-        };
+        try {
+            setIsSubmitting(true);
+            await apiClient.post("/applications/adoption", {
+                petId: Number(formData.petId),
+                customerId: Number(formData.customerId),
+            });
 
-        localStorage.setItem(
-            "applications",
-            JSON.stringify([...existingApplications, applicationData])
-        );
-
-        console.log("Adoption Application Submitted:", applicationData);
-        setSubmitted(true);
+            setSubmitted(true);
+        } catch (error) {
+            const apiMessage =
+                error?.response?.data?.details ||
+                error?.response?.data?.message ||
+                "Failed to submit application. Please try again.";
+            setSubmitError(apiMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (submitted) {
@@ -142,6 +135,19 @@ function ApplyAdoption() {
 
                         <div>
                             <label className="mb-2 block text-sm font-medium text-gray-700">
+                                Customer ID
+                            </label>
+                            <input
+                                type="text"
+                                name="customerId"
+                                value={formData.customerId}
+                                readOnly
+                                className="w-full rounded-xl border border-gray-300 bg-gray-100 px-4 py-3 outline-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="mb-2 block text-sm font-medium text-gray-700">
                                 Email
                             </label>
                             <input
@@ -205,10 +211,15 @@ function ApplyAdoption() {
 
                         <button
                             type="submit"
-                            className="rounded-xl bg-[#1f5c3f] px-6 py-3 font-medium text-white transition hover:bg-[#0f2f20]"
+                            disabled={isSubmitting}
+                            className="rounded-xl bg-[#1f5c3f] px-6 py-3 font-medium text-white transition hover:bg-[#0f2f20] disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            Apply
+                            {isSubmitting ? "Submitting..." : "Apply"}
                         </button>
+
+                        {submitError && (
+                            <p className="text-sm font-medium text-red-600">{submitError}</p>
+                        )}
                     </form>
 
                     <p className="mt-6 text-sm text-gray-600">

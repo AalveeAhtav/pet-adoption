@@ -7,15 +7,15 @@ router.get("/", async (_req, res) => {
     try {
         const [rows] = await pool.query(
             `SELECT
-                pet_id,
-                pet_name,
+                petID AS pet_id,
+                petName AS pet_name,
                 species,
                 breed,
                 age,
-                arrival_date,
+                arrivalDate AS arrival_date,
                 status
-             FROM pet
-             ORDER BY pet_id DESC`
+             FROM Pet
+             ORDER BY petID DESC`
         );
 
         res.status(200).json(rows);
