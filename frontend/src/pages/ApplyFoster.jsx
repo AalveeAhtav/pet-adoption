@@ -1,6 +1,7 @@
 import { Link, useParams, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import apiClient from "../lib/apiClient";
 
 function ApplyFoster() {
     const { petId } = useParams();
@@ -19,6 +20,8 @@ function ApplyFoster() {
     });
 
     const [submitted, setSubmitted] = useState(false);
+    const [submitError, setSubmitError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const location = useLocation();
     const pet = location.state;
@@ -30,44 +33,33 @@ function ApplyFoster() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitError("");
 
-        const existingApplications =
-            JSON.parse(localStorage.getItem("applications")) || [];
-
-        const applicationData = {
-            id: Date.now(),
-            type: "foster",
-            petId: formData.petId,
-            customerId: formData.customerId,
-            customerName: formData.fullName,
-            customerEmail: formData.email,
-            fullName: formData.fullName,
-            email: formData.email,
-            petName: pet?.name || `Pet #${formData.petId}`,
-            petBreed: pet?.breed || "Unknown Breed",
-            submittedDate: new Date().toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-            }),
-            notes: "Foster application received successfully.",
-            status: "Pending",
-            housing: formData.housing,
-            address: formData.address,
-            startDate: formData.startDate,
-            endDate: formData.endDate,
-            experience: formData.experience,
-        };
-
-        localStorage.setItem(
-            "applications",
-            JSON.stringify([...existingApplications, applicationData])
-        );
-
-        console.log("Foster Application Submitted:", applicationData);
-        setSubmitted(true);
+        try {
+            setIsSubmitting(true);
+            await apiClient.post("/applications/foster", {
+                petId: Number(formData.petId),
+                customerId: Number(formData.customerId),
+                fullName: formData.fullName,
+                email: formData.email,
+                housing: formData.housing,
+                address: formData.address,
+                startDate: formData.startDate,
+                endDate: formData.endDate,
+                experience: formData.experience,
+            });
+            setSubmitted(true);
+        } catch (error) {
+            const apiMessage =
+                error?.response?.data?.details ||
+                error?.response?.data?.message ||
+                "Failed to submit foster application. Please try again.";
+            setSubmitError(apiMessage);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (submitted) {
@@ -236,10 +228,15 @@ function ApplyFoster() {
 
                         <button
                             type="submit"
-                            className="rounded-xl bg-[#1f5c3f] px-6 py-3 font-medium text-white transition hover:bg-[#0f2f20]"
+                            disabled={isSubmitting}
+                            className="rounded-xl bg-[#1f5c3f] px-6 py-3 font-medium text-white transition hover:bg-[#0f2f20] disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            Submit
+                            {isSubmitting ? "Submitting..." : "Submit"}
                         </button>
+
+                        {submitError && (
+                            <p className="text-sm font-medium text-red-600">{submitError}</p>
+                        )}
                     </form>
 
                     <p className="mt-6 text-sm text-gray-600">

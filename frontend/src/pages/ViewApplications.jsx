@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuth } from "../context/AuthContext";
+import apiClient from "../lib/apiClient";
 
 function ViewApplications() {
     const { user } = useAuth();
@@ -10,49 +11,47 @@ function ViewApplications() {
     // selected type user wants to view first
     const [selectedType, setSelectedType] = useState("");
 
-    // load only user-submitted applications from localStorage
+    // load only user-submitted applications from backend
     const [applications, setApplications] = useState([]);
 
-    // keep user page in sync with latest localStorage data
     useEffect(() => {
         if (!user) {
             setApplications([]);
             return;
         }
 
-        const savedApplications =
-            JSON.parse(localStorage.getItem("applications")) || [];
+        async function loadApplications() {
+            try {
+                const { data } = await apiClient.get("/applications");
+                const userApplications = data
+                    .filter(
+                        (application) =>
+                            Number(application.customer_id) === Number(user.customerId)
+                    )
+                    .map((application) => ({
+                        id: application.application_id,
+                        type: application.application_type || "adoption",
+                        petName: application.pet_name,
+                        petBreed: "From shelter records",
+                        submittedDate: `Application #${application.application_id}`,
+                        notes:
+                            application.status === "Pending"
+                                ? `Your ${application.application_type || "adoption"} request is pending review.`
+                                : application.status === "Approved"
+                                  ? "Your application has been approved by the admin."
+                                  : "Your application has been rejected by the admin.",
+                        status: application.status,
+                        customerId: application.customer_id,
+                    }));
 
-        const userApplications = savedApplications.filter(
-            (application) => Number(application.customerId) === Number(user.customerId)
-        );
-
-        setApplications(userApplications);
-    }, [user, selectedType]);
-
-    // handles canceling an application
-    function handleCancelApplication(applicationId) {
-        const confirmed = window.confirm(
-            "Are you sure you want to cancel this application?"
-        );
-
-        if (!confirmed) {
-            return;
+                setApplications(userApplications);
+            } catch (_error) {
+                setApplications([]);
+            }
         }
 
-        const allApplications = JSON.parse(localStorage.getItem("applications")) || [];
-
-        const updatedAllApplications = allApplications.filter(
-            (application) => application.id !== applicationId
-        );
-
-        const updatedUserApplications = updatedAllApplications.filter(
-            (application) => Number(application.customerId) === Number(user.customerId)
-        );
-
-        setApplications(updatedUserApplications);
-        localStorage.setItem("applications", JSON.stringify(updatedAllApplications));
-    }
+        loadApplications();
+    }, [user]);
 
     // filter applications based on selected type
     const filteredApplications = useMemo(() => {
@@ -206,12 +205,9 @@ function ViewApplications() {
 
                                         <div className="mt-6">
                                             {application.status === "Pending" ? (
-                                                <button
-                                                    onClick={() => handleCancelApplication(application.id)}
-                                                    className="rounded-xl border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100"
-                                                >
-                                                    Cancel Application
-                                                </button>
+                                                <span className="text-sm font-medium text-yellow-700">
+                                                    Your application is pending review.
+                                                </span>
                                             ) : application.status === "Approved" ? (
                                                 <span className="text-sm font-medium text-green-700">
                                                     Your application has been accepted.
