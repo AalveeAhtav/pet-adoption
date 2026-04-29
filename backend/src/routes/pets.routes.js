@@ -1,15 +1,29 @@
 import { Router } from "express";
 import pool from "../db/pool.js";
+import multer from "multer";
+import path from "path";
+
+const storage = multer.diskStorage({
+    destination: "uploads/",
+    filename: (_req, file, cb) => {
+        const uniqueName = `${Date.now()}-${file.originalname}`;
+        cb(null, uniqueName);
+    },
+});
+
+const upload = multer({ storage });
 
 const router = Router();
 
-router.post("/", async (req, res) => {
+router.post("/", upload.single("imageFile"), async (req, res) => {
     const petName = String(req.body?.name || "").trim();
     const species = String(req.body?.type || "").trim().toLowerCase();
     const breed = String(req.body?.breed || "").trim();
     const gender = String(req.body?.gender || "").trim();
     const location = String(req.body?.location || "").trim();
-    const image = String(req.body?.image || "").trim();
+    const image = req.file
+        ? `/uploads/${req.file.filename}`
+        : String(req.body?.image || "").trim();
     const purpose = String(req.body?.purpose || "").trim().toLowerCase();
     const description = String(req.body?.description || "").trim();
     const parsedAge = Number(req.body?.age);
@@ -25,7 +39,7 @@ router.post("/", async (req, res) => {
         const [result] = await pool.query(
             `INSERT INTO Pet (
                 petName, species, breed, age, arrivalDate, status,
-                gender, shelterLocation, imageUrl, purpose, profileDescription
+                gender, location, image, purpose, description
              ) VALUES (?, ?, ?, ?, CURDATE(), 'Sheltered', ?, ?, ?, ?, ?)`,
             [
                 petName,
@@ -116,7 +130,7 @@ router.patch("/:petId", async (req, res) => {
         const [result] = await pool.query(
             `UPDATE Pet
              SET petName = ?, species = ?, breed = ?, age = ?,
-                 gender = ?, shelterLocation = ?, imageUrl = ?, purpose = ?, profileDescription = ?
+                 gender = ?, location = ?, image = ?, purpose = ?, description = ?
              WHERE petID = ?`,
             [
                 petName,
@@ -153,21 +167,21 @@ router.get("/", async (_req, res) => {
     try {
         const [rows] = await pool.query(
             `SELECT
-                petID AS pet_id,
-                petName AS pet_name,
+                petID,
+                petName,
                 species,
                 breed,
                 age,
-                arrivalDate AS arrival_date,
+                arrivalDate,
                 status,
                 gender,
-                shelterLocation AS shelter_location,
-                imageUrl AS image_url,
+                location,
+                image,
                 purpose,
-                profileDescription AS profile_description
-             FROM Pet
-             WHERE status = 'Sheltered'
-             ORDER BY petID DESC`
+                description
+             FROM pet
+             WHERE status != 'Adopted'
+             ORDER BY petID ASC`
         );
 
         res.status(200).json(rows);

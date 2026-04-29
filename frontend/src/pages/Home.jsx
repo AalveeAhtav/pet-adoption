@@ -13,113 +13,113 @@ function Home() {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    // These are dummy data so that I could quickly build the UI. The actual data would come from an API or database.
-    const defaultPets = [
-        {
-            id: 1,
-            name: "Max",
-            breed: "Golden Retriever",
-            type: "dog",
-            age: "2 Years",
-            gender: "Male",
-            location: "Dallas, TX",
-            purpose: "adoption",
-            description: "Max is a friendly and playful dog who loves long walks, attention, and spending time with families. He would make a great forever companion for an active home.",
-            image:
-                "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 2,
-            name: "Bella",
-            breed: "Labrador",
-            type: "dog",
-            age: "1 Year",
-            gender: "Female",
-            location: "Plano, TX",
-            purpose: "foster",
-            description: "Bella is gentle, affectionate, and still adjusting to shelter life. She is currently looking for a safe foster home where she can feel comfortable and cared for.",
-            image:
-                "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 3,
-            name: "Oliver",
-            breed: "Tabby Cat",
-            type: "cat",
-            age: "3 Years",
-            gender: "Male",
-            location: "Richardson, TX",
-            purpose: "adoption",
-            description: "Oliver is a calm and curious cat who enjoys cozy naps and quiet afternoons. He is ready for a permanent home where he can settle in and be loved.",
-            image:
-                "https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 4,
-            name: "Daisy",
-            breed: "Beagle",
-            type: "dog",
-            age: "2 Years",
-            gender: "Female",
-            location: "Garland, TX",
-            purpose: "adoption",
-            description: "Daisy is energetic, sweet, and always excited to meet new people. She would do well with a family that can give her playtime, attention, and a loving forever home.",
-            image:
-                "https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 5,
-            name: "Rocky",
-            breed: "German Shepherd",
-            type: "dog",
-            age: "4 Years",
-            gender: "Male",
-            location: "McKinney, TX",
-            purpose: "foster",
-            description: "Rocky is loyal and intelligent, but he needs a temporary foster placement while he continues his transition. He does best with structure, patience, and a calm environment.",
-            image:
-                "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 6,
-            name: "Luna",
-            breed: "Siamese Cat",
-            type: "cat",
-            age: "1 Year",
-            gender: "Female",
-            location: "Frisco, TX",
-            purpose: "adoption",
-            description: "Luna is affectionate, playful, and loves being near people. She is available for adoption and would be a wonderful fit for someone looking for a loving companion.",
-            image:
-                "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 7,
-            name: "Charlie",
-            breed: "Poodle",
-            type: "dog",
-            age: "2 Years",
-            gender: "Male",
-            location: "Irving, TX",
-            purpose: "foster",
-            description: "Charlie is smart, friendly, and easy to bond with. He is currently looking for a foster home that can give him consistent care and a comfortable place to stay.",
-            image:
-                "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=800&q=80",
-        },
-        {
-            id: 8,
-            name: "Milo",
-            breed: "Orange Tabby",
-            type: "cat",
-            age: "5 Months",
-            gender: "Male",
-            location: "Dallas, TX",
-            purpose: "adoption",
-            description: "Milo is a young and playful kitten full of energy and curiosity. He is available for adoption and would thrive in a home ready for a fun and lovable new addition.",
-            image:
-                "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=800&q=80",
-        },
-    ];
+    // // These are dummy data so that I could quickly build the UI. The actual data would come from an API or database.
+    // const defaultPets = [
+    //     {
+    //         id: 1,
+    //         name: "Max",
+    //         breed: "Golden Retriever",
+    //         type: "dog",
+    //         age: "2 Years",
+    //         gender: "Male",
+    //         location: "Dallas, TX",
+    //         purpose: "adoption",
+    //         description: "Max is a friendly and playful dog who loves long walks, attention, and spending time with families. He would make a great forever companion for an active home.",
+    //         image:
+    //             "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&w=800&q=80",
+    //     },
+    //     {
+    //         id: 2,
+    //         name: "Bella",
+    //         breed: "Labrador",
+    //         type: "dog",
+    //         age: "1 Year",
+    //         gender: "Female",
+    //         location: "Plano, TX",
+    //         purpose: "foster",
+    //         description: "Bella is gentle, affectionate, and still adjusting to shelter life. She is currently looking for a safe foster home where she can feel comfortable and cared for.",
+    //         image:
+    //             "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=800&q=80",
+    //     },
+    //     {
+    //         id: 3,
+    //         name: "Oliver",
+    //         breed: "Tabby Cat",
+    //         type: "cat",
+    //         age: "3 Years",
+    //         gender: "Male",
+    //         location: "Richardson, TX",
+    //         purpose: "adoption",
+    //         description: "Oliver is a calm and curious cat who enjoys cozy naps and quiet afternoons. He is ready for a permanent home where he can settle in and be loved.",
+    //         image:
+    //             "https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=800&q=80",
+    //     },
+    //     {
+    //         id: 4,
+    //         name: "Daisy",
+    //         breed: "Beagle",
+    //         type: "dog",
+    //         age: "2 Years",
+    //         gender: "Female",
+    //         location: "Garland, TX",
+    //         purpose: "adoption",
+    //         description: "Daisy is energetic, sweet, and always excited to meet new people. She would do well with a family that can give her playtime, attention, and a loving forever home.",
+    //         image:
+    //             "https://images.unsplash.com/photo-1505628346881-b72b27e84530?auto=format&fit=crop&w=800&q=80",
+    //     },
+    //     {
+    //         id: 5,
+    //         name: "Rocky",
+    //         breed: "German Shepherd",
+    //         type: "dog",
+    //         age: "4 Years",
+    //         gender: "Male",
+    //         location: "McKinney, TX",
+    //         purpose: "foster",
+    //         description: "Rocky is loyal and intelligent, but he needs a temporary foster placement while he continues his transition. He does best with structure, patience, and a calm environment.",
+    //         image:
+    //             "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=800&q=80",
+    //     },
+    //     {
+    //         id: 6,
+    //         name: "Luna",
+    //         breed: "Siamese Cat",
+    //         type: "cat",
+    //         age: "1 Year",
+    //         gender: "Female",
+    //         location: "Frisco, TX",
+    //         purpose: "adoption",
+    //         description: "Luna is affectionate, playful, and loves being near people. She is available for adoption and would be a wonderful fit for someone looking for a loving companion.",
+    //         image:
+    //             "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?auto=format&fit=crop&w=800&q=80",
+    //     },
+    //     {
+    //         id: 7,
+    //         name: "Charlie",
+    //         breed: "Poodle",
+    //         type: "dog",
+    //         age: "2 Years",
+    //         gender: "Male",
+    //         location: "Irving, TX",
+    //         purpose: "foster",
+    //         description: "Charlie is smart, friendly, and easy to bond with. He is currently looking for a foster home that can give him consistent care and a comfortable place to stay.",
+    //         image:
+    //             "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=800&q=80",
+    //     },
+    //     {
+    //         id: 8,
+    //         name: "Milo",
+    //         breed: "Orange Tabby",
+    //         type: "cat",
+    //         age: "5 Months",
+    //         gender: "Male",
+    //         location: "Dallas, TX",
+    //         purpose: "adoption",
+    //         description: "Milo is a young and playful kitten full of energy and curiosity. He is available for adoption and would thrive in a home ready for a fun and lovable new addition.",
+    //         image:
+    //             "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=800&q=80",
+    //     },
+    // ];
 
     //state for featured pets shown on the homepage
     const [featuredPets, setFeaturedPets] = useState([]);
@@ -128,48 +128,41 @@ function Home() {
         async function loadFeaturedPets() {
             try {
                 const { data } = await apiClient.get("/pets");
+
                 const mappedPets = data.map((pet) => ({
-                    id: pet.pet_id,
-                    name: pet.pet_name,
+                    id: pet.petID,
+                    name: pet.petName,
                     breed: pet.breed || "Unknown Breed",
-                    type: (pet.species || "other").toLowerCase(),
-                    age: pet.age !== null ? `${pet.age} Years` : "Unknown",
+                    type: pet.species?.toLowerCase() || "other",
+                    age: pet.age === 0 ? "Less than 1 year" : `${pet.age} Years`,
                     gender: pet.gender || "Unknown",
-                    location: pet.shelter_location || "Shelter",
+                    location: pet.location || "Shelter",
                     purpose: (pet.purpose || "adoption").toLowerCase(),
                     description:
-                        pet.profile_description ||
-                        `${pet.pet_name} is currently ${pet.status?.toLowerCase() || "available"} and looking for a home.`,
+                        pet.description ||
+                        `${pet.petName} is currently ${pet.status?.toLowerCase() || "available"} and looking for a home.`,
                     image:
-                        pet.image_url ||
+                        pet.image ||
                         "https://images.unsplash.com/photo-1450778869180-41d0601e046e?auto=format&fit=crop&w=800&q=80",
                 }));
 
                 setFeaturedPets(mappedPets.slice(0, 4));
-                return;
-            } catch (_error) {
-                // fall back to default/home demo cards only if backend is unavailable
+            } catch (error) {
+                console.error("Failed to load featured pets:", error);
+                setFeaturedPets([]);
             }
-
-            const storedPets = JSON.parse(localStorage.getItem("pets")) || [];
-            const mergedPets = [...defaultPets];
-
-            storedPets.forEach((storedPet) => {
-                const alreadyExists = mergedPets.some(
-                    (pet) => Number(pet.id) === Number(storedPet.id)
-                );
-
-                if (!alreadyExists) {
-                    mergedPets.push(storedPet);
-                }
-            });
-
-            localStorage.setItem("pets", JSON.stringify(mergedPets));
-            setFeaturedPets(mergedPets.slice(0, 4));
         }
 
         loadFeaturedPets();
     }, []);
+
+    function getPetImage(image) {
+        if (!image) return "";
+
+        return image.startsWith("http")
+            ? image
+            : `http://localhost:5000${image}`;
+    }
 
     //steps for the adoption and foster process
     const adoptionSteps = [
@@ -281,26 +274,41 @@ function Home() {
     }
 
     //saves the edited pet and updates localStorage and homepage list
-    function handleSavePetEdits() {
+    async function handleSavePetEdits() {
         if (!selectedPet) {
             return;
         }
 
-        const existingPets = JSON.parse(localStorage.getItem("pets")) || [];
-        const updatedPets = existingPets.map((pet) =>
-            Number(pet.id) === Number(selectedPet.id)
-                ? { ...pet, ...editFormData }
-                : pet
-        );
+        try {
+            await apiClient.patch(`/pets/${selectedPet.id}`, {
+                name: editFormData.name,
+                breed: editFormData.breed,
+                type: editFormData.type,
+                age: parseInt(editFormData.age),
+                gender: editFormData.gender,
+                location: editFormData.location,
+                image: editFormData.image,
+                purpose: editFormData.purpose,
+                description: editFormData.description,
+            });
 
-        const updatedSelectedPet = updatedPets.find(
-            (pet) => Number(pet.id) === Number(selectedPet.id)
-        );
+            const updatedPet = {
+                ...selectedPet,
+                ...editFormData,
+            };
 
-        localStorage.setItem("pets", JSON.stringify(updatedPets));
-        setFeaturedPets(updatedPets.slice(0, 4));
-        setSelectedPet(updatedSelectedPet);
-        setIsEditingPet(false);
+            setFeaturedPets((prevPets) =>
+                prevPets.map((pet) =>
+                    Number(pet.id) === Number(selectedPet.id) ? updatedPet : pet
+                )
+            );
+
+            setSelectedPet(updatedPet);
+            setIsEditingPet(false);
+        } catch (error) {
+            console.error("Failed to update pet:", error);
+            alert("Unable to update pet.");
+        }
     }
 
     //navigates to the correct application page based on whether the pet is for adoption or foster
@@ -320,32 +328,28 @@ function Home() {
     }
 
     //handles deleting a pet for admins only and also removes any related applications
-    function handleDeletePet(petId) {
+    async function handleDeletePet(petId) {
         const confirmed = window.confirm(
-            "Are you sure you want to delete this pet? This will also remove related applications."
+            "Are you sure you want to delete this pet?"
         );
 
         if (!confirmed) {
             return;
         }
 
-        const existingPets = JSON.parse(localStorage.getItem("pets")) || [];
-        const updatedPets = existingPets.filter(
-            (pet) => Number(pet.id) !== Number(petId)
-        );
+        try {
+            await apiClient.delete(`/pets/${petId}`);
 
-        const existingApplications =
-            JSON.parse(localStorage.getItem("applications")) || [];
+            setFeaturedPets((prevPets) =>
+                prevPets.filter((pet) => Number(pet.id) !== Number(petId))
+            );
 
-        const updatedApplications = existingApplications.filter(
-            (application) => Number(application.petId) !== Number(petId)
-        );
-
-        localStorage.setItem("pets", JSON.stringify(updatedPets));
-        localStorage.setItem("applications", JSON.stringify(updatedApplications));
-        setFeaturedPets(updatedPets.slice(0, 4));
-        setSelectedPet(null);
-        setIsEditingPet(false);
+            setSelectedPet(null);
+            setIsEditingPet(false);
+        } catch (error) {
+            console.error("Failed to delete pet:", error);
+            alert(error.response?.data?.message || "Unable to delete pet.");
+        }
     }
 
     //main return statement for the homepage. It includes the navbar, hero section, featured pets, adoption steps, and footer.
@@ -602,11 +606,11 @@ function Home() {
                             </div>
                         ) : (
                             <>
-                                <img
-                                    src={selectedPet.image}
-                                    alt={selectedPet.name}
-                                    className="mt-4 h-72 w-full rounded-[20px] object-cover"
-                                />
+                                   <img
+                                        src={getPetImage(selectedPet.image)}
+                                        alt={selectedPet.name}
+                                        className="mt-4 h-72 w-full rounded-[20px] object-cover"
+                                    />
 
                                 <div className="mt-6">
                                     <div className="flex flex-wrap items-center gap-3">
@@ -641,6 +645,12 @@ function Home() {
                                             ? "Available for Foster"
                                             : "Available for Adoption or Foster"}
                                     </p>
+
+                                   {selectedPet.purpose === "adoption" && (
+                                        <p className="text-sm text-gray-600 mt-2">
+                                            Adoption Fee: <span className="font-semibold text-green-700">$150</span>
+                                        </p>
+                                    )}
 
                                     <div className="mt-4 flex flex-col gap-3">
                                         <button
