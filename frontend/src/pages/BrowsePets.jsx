@@ -606,6 +606,12 @@ function BrowsePets() {
                                             : "Available for Adoption or Foster"}
                                     </p>
 
+                                    {selectedPet.purpose === "adoption" && (
+                                        <p className="text-sm text-gray-600 mt-2">
+                                            Adoption Fee: <span className="font-semibold text-green-700">$150</span>
+                                        </p>
+                                    )}
+
                                     <div className="mt-4 flex flex-col gap-3">
                                         <button
                                             onClick={() => handleApplyClick(selectedPet)}

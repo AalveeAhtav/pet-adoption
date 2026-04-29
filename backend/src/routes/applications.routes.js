@@ -213,7 +213,7 @@ router.patch("/:applicationId/status", async (req, res) => {
         if (status === "Approved" && application.applicationType === "adoption") {
             await connection.query(
                 `INSERT INTO Adoption (petID, customerID, feePaid, adoptionDate)
-                 SELECT ?, ?, 0.00, NOW()
+                 SELECT ?, ?, 150.00, NOW()
                  FROM DUAL
                  WHERE NOT EXISTS (
                     SELECT 1
