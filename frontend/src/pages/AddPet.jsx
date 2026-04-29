@@ -20,6 +20,7 @@ function AddPet() {
     });
 
     const [uploadedImage, setUploadedImage] = useState("");
+    const [uploadedImageFile, setUploadedImageFile] = useState(null);
     const [successMessage, setSuccessMessage] = useState("");
     const [submitError, setSubmitError] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,6 +41,8 @@ function AddPet() {
             return;
         }
 
+        setUploadedImageFile(file);
+
         const reader = new FileReader();
 
         reader.onloadend = () => {
@@ -51,6 +54,7 @@ function AddPet() {
 
     const handleRemoveImage = () => {
         setUploadedImage("");
+        setUploadedImageFile(null);
         setFormData((prev) => ({
             ...prev,
             image: "",
@@ -68,19 +72,31 @@ function AddPet() {
 
         try {
             setIsSubmitting(true);
-            const { data } = await apiClient.post("/pets", {
-                name: formData.name,
-                breed: formData.breed,
-                type: formData.type,
-                age: Number(formData.age),
-                gender: formData.gender,
-                location: formData.location,
-                image: uploadedImage || formData.image,
-                purpose: formData.purpose,
-                description: formData.description,
+
+            const petForm = new FormData();
+
+            petForm.append("name", formData.name);
+            petForm.append("breed", formData.breed);
+            petForm.append("type", formData.type);
+            petForm.append("age", Number(formData.age));
+            petForm.append("gender", formData.gender);
+            petForm.append("location", formData.location);
+            petForm.append("image", formData.image);
+            petForm.append("purpose", formData.purpose);
+            petForm.append("description", formData.description);
+
+            if (uploadedImageFile) {
+                petForm.append("imageFile", uploadedImageFile);
+            }
+
+            const { data } = await apiClient.post("/pets", petForm, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
             });
 
             setSuccessMessage(`Pet added successfully (ID: ${data.petId}).`);
+
             setFormData({
                 name: "",
                 breed: "",
@@ -92,7 +108,9 @@ function AddPet() {
                 purpose: "",
                 description: "",
             });
+
             setUploadedImage("");
+            setUploadedImageFile(null);
         } catch (error) {
             setSubmitError(
                 error?.response?.data?.message ||
@@ -163,13 +181,14 @@ function AddPet() {
                         </select>
 
                         <input
-                            type="text"
+                            type="number"
                             name="age"
                             value={formData.age}
                             onChange={handleChange}
                             placeholder="Age"
-                            className="rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-[#123826]"
+                            min="0"
                             required
+                            className="..."
                         />
 
                         <select

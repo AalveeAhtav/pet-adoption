@@ -185,7 +185,7 @@ router.patch("/:applicationId/status", async (req, res) => {
         await connection.beginTransaction();
 
         const [applicationRows] = await connection.query(
-            `SELECT applicationID, petID, customerID, status
+            `SELECT applicationID, petID, customerID, status, applicationType
              FROM AppliesForAdoption
              WHERE applicationID = ?
              LIMIT 1`,
@@ -204,7 +204,7 @@ router.patch("/:applicationId/status", async (req, res) => {
         const previousStatus = application.status;
         const petId = application.petID;
         const customerId = application.customerID;
-
+        const applicationType = application.applicationType;
         await connection.query(
             "UPDATE AppliesForAdoption SET status = ? WHERE applicationID = ?",
             [status, applicationId]
