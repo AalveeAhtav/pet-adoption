@@ -11,6 +11,9 @@ function Login() {
         rememberMe: false,
     });
 
+    // NEW: toggle password visibility
+    const [showPassword, setShowPassword] = useState(false);
+
     const { login } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -81,16 +84,28 @@ function Login() {
                             >
                                 Password
                             </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder="Enter your password"
-                                className="w-full rounded-2xl border border-gray-200 bg-[#f8f8f6] px-4 py-3 outline-none transition focus:border-[#1f5c3f] focus:ring-2 focus:ring-[#1f5c3f]/20"
-                                required
-                            />
+
+                            {/* UPDATED: password with show/hide */}
+                            <div className="relative">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    placeholder="Enter your password"
+                                    className="w-full rounded-2xl border border-gray-200 bg-[#f8f8f6] px-4 py-3 pr-16 outline-none transition focus:border-[#1f5c3f] focus:ring-2 focus:ring-[#1f5c3f]/20"
+                                    required
+                                />
+
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-[#1f5c3f] hover:text-[#174a32]"
+                                >
+                                    {showPassword ? "Hide" : "Show"}
+                                </button>
+                            </div>
                         </div>
 
                         <div className="flex items-center justify-between text-sm">

@@ -49,6 +49,8 @@ function ForgotPassword() {
         }
     };
 
+    const [showPassword, setShowPassword] = useState(false);
+
     return (
         <div className="min-h-screen bg-[#f8f8f6] text-[#1f1f1f]">
             <Navbar />
@@ -87,15 +89,25 @@ function ForgotPassword() {
                                 <label className="mb-2 block text-sm font-medium">
                                     New Password
                                 </label>
-                                <input
-                                    name="newPassword"
-                                    type="password"
-                                    value={formData.newPassword}
-                                    onChange={handleChange}
-                                    placeholder="Enter new password"
-                                    className="w-full rounded-2xl border border-gray-200 bg-[#f8f8f6] px-4 py-3 outline-none focus:border-[#1f5c3f] focus:ring-2 focus:ring-[#1f5c3f]/20"
-                                    required
-                                />
+
+                                <div className="relative">
+                                    <input
+                                        name="newPassword"
+                                        type={showPassword ? "text" : "password"}
+                                        value={formData.newPassword}
+                                        onChange={handleChange}
+                                        placeholder="Enter new password"
+                                        className="w-full rounded-2xl border border-gray-200 bg-[#f8f8f6] px-4 py-3 outline-none focus:border-[#1f5c3f] focus:ring-2 focus:ring-[#1f5c3f]/20"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium text-[#1f5c3f] hover:text-[#174a32]">
+                                        {showPassword ? "Hide" : "Show"}
+
+                                    </button>
+                                </div>  
                             </div>
 
                             {errorMessage ? (
