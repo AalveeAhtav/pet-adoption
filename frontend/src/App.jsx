@@ -11,6 +11,7 @@ import ApplyFoster from "./pages/ApplyFoster";
 import ViewApplications from "./pages/ViewApplications";
 import AddPet from "./pages/AddPet";
 import ViewAllApplications from "./pages/ViewAllApplications";
+import ForgotPassword from "./pages/ForgotPassword";
 
 function App() {
     return (
@@ -20,6 +21,7 @@ function App() {
                 <Route path="/pets" element={<BrowsePets />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
 
                 <Route
                     path="/apply-adoption/:petId"

@@ -105,12 +105,12 @@ function Login() {
                                 Remember me
                             </label>
 
-                            <a
-                                href="#"
+                            <Link
+                                to="/forgot-password"
                                 className="font-medium text-[#1f5c3f] hover:text-[#174a32]"
                             >
                                 Forgot password?
-                            </a>
+                            </Link>
                         </div>
 
                         <button
