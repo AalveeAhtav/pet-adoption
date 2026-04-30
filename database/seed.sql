@@ -58,10 +58,10 @@ VALUES
 -- --------------------
 -- CUSTOMER DATA (fake users)
 -- --------------------
-INSERT INTO customer (customerID, Fname, Lname, email, address, phoneNumber)
+INSERT INTO customer (customerID, Fname, Lname, email, password, address, phoneNumber)
 VALUES
-(1, 'John', 'Doe', 'john@email.com', 'Dallas, TX', '2141111111'),
-(2, 'Jane', 'Smith', 'jane@email.com', 'Plano, TX', '9722222222');
+(1, 'John', 'Doe', 'john@email.com', '1234', 'Dallas, TX', '2141111111'),
+(2, 'Jane', 'Smith', 'jane@email.com', '1234', 'Plano, TX', '9722222222');
 
 -- --------------------
 -- SAMPLE APPLICATIONS

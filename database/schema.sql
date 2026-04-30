@@ -24,6 +24,7 @@ CREATE TABLE Customer (
     Fname VARCHAR(20) NOT NULL,
     Lname VARCHAR(20) NOT NULL,
     email VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL DEFAULT '',
     address VARCHAR(255),
     phoneNumber VARCHAR(15),
 

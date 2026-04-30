@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import apiClient from "../lib/apiClient";
 
 function ForgotPassword() {
     const [formData, setFormData] = useState({
@@ -10,6 +11,8 @@ function ForgotPassword() {
     });
 
     const [success, setSuccess] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -20,16 +23,30 @@ function ForgotPassword() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setErrorMessage("");
+        setIsSubmitting(true);
 
-        // demo mode: always succeeds
-        setSuccess(true);
+        try {
+            await apiClient.post("/auth/forgot-password", {
+                email: formData.email,
+                newPassword: formData.newPassword,
+            });
 
-        setFormData({
-            email: "",
-            newPassword: "",
-        });
+            setSuccess(true);
+            setFormData({
+                email: "",
+                newPassword: "",
+            });
+        } catch (error) {
+            setErrorMessage(
+                error?.response?.data?.message ||
+                    "Unable to reset password right now. Please try again."
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -57,7 +74,7 @@ function ForgotPassword() {
                                 </label>
                                 <input
                                     name="email"
-                                    type="text"
+                                    type="email"
                                     value={formData.email}
                                     onChange={handleChange}
                                     placeholder="Enter email"
@@ -72,7 +89,7 @@ function ForgotPassword() {
                                 </label>
                                 <input
                                     name="newPassword"
-                                    type="text"
+                                    type="password"
                                     value={formData.newPassword}
                                     onChange={handleChange}
                                     placeholder="Enter new password"
@@ -81,11 +98,18 @@ function ForgotPassword() {
                                 />
                             </div>
 
+                            {errorMessage ? (
+                                <p className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
+                                    {errorMessage}
+                                </p>
+                            ) : null}
+
                             <button
                                 type="submit"
+                                disabled={isSubmitting}
                                 className="w-full rounded-2xl bg-[#1f5c3f] py-3 text-white hover:bg-[#174a32]"
                             >
-                                Reset Password
+                                {isSubmitting ? "Resetting..." : "Reset Password"}
                             </button>
                         </form>
                     ) : (

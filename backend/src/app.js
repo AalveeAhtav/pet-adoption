@@ -4,6 +4,7 @@ import env from "./config/env.js";
 import healthRoutes from "./routes/health.routes.js";
 import petsRoutes from "./routes/pets.routes.js";
 import applicationsRoutes from "./routes/applications.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -31,5 +32,6 @@ app.get("/", (_req, res) => {
 app.use("/api/health", healthRoutes);
 app.use("/api/pets", petsRoutes);
 app.use("/api/applications", applicationsRoutes);
+app.use("/api/auth", authRoutes);
 
 export default app;
