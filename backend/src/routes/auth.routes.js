@@ -25,6 +25,12 @@ router.post("/forgot-password", async (req, res) => {
             });
         }
 
+        // THE RIGHT SQL QUERY SHOULD BE:
+        // const [result] = await pool.query (
+        //     'update customer set password = ? where email = ? LIMIT 1',
+        //     [newPassword, email]
+        // );
+
         return res.status(200).json({
             message: "Password reset successful.",
         });

@@ -74,10 +74,18 @@ router.post("/foster", async (req, res) => {
     const customerId = Number(req.body?.customerId);
     const fullName = String(req.body?.fullName || "").trim();
     const email = String(req.body?.email || "").trim();
+    const startDate = req.body?.startDate || null;
+    const endDate = req.body?.endDate || null;
 
     if (!Number.isInteger(petId) || !Number.isInteger(customerId)) {
         return res.status(400).json({
             message: "Valid numeric petId and customerId are required.",
+        });
+    }
+
+    if (!startDate) {
+        return res.status(400).json({
+            message: "Start date is required for foster applications.",
         });
     }
 
@@ -112,9 +120,10 @@ router.post("/foster", async (req, res) => {
         }
 
         const [result] = await pool.query(
-            `INSERT INTO AppliesForAdoption (petID, customerID, status, applicationType)
-             VALUES (?, ?, 'Pending', 'foster')`,
-            [petId, customerId]
+            `INSERT INTO AppliesForAdoption
+                (petID, customerID, status, applicationType, startDate, endDate)
+             VALUES (?, ?, 'Pending', 'foster', ?, ?)`,
+            [petId, customerId, startDate, endDate]
         );
 
         return res.status(201).json({
@@ -144,6 +153,8 @@ router.get("/", async (_req, res) => {
                 a.customerID AS customer_id,
                 a.status,
                 a.applicationType AS application_type,
+                a.startDate AS start_date,
+                a.endDate AS end_date,
                 p.petName AS pet_name,
                 c.Fname AS customer_fname,
                 c.Lname AS customer_lname,
@@ -185,7 +196,7 @@ router.patch("/:applicationId/status", async (req, res) => {
         await connection.beginTransaction();
 
         const [applicationRows] = await connection.query(
-            `SELECT applicationID, petID, customerID, status, applicationType
+            `SELECT applicationID, petID, customerID, status, applicationType, startDate, endDate
              FROM AppliesForAdoption
              WHERE applicationID = ?
              LIMIT 1`,
@@ -204,7 +215,7 @@ router.patch("/:applicationId/status", async (req, res) => {
         const previousStatus = application.status;
         const petId = application.petID;
         const customerId = application.customerID;
-        const applicationType = application.applicationType;
+
         await connection.query(
             "UPDATE AppliesForAdoption SET status = ? WHERE applicationID = ?",
             [status, applicationId]
@@ -241,14 +252,15 @@ router.patch("/:applicationId/status", async (req, res) => {
         if (status === "Approved" && application.applicationType === "foster") {
             await connection.query(
                 `INSERT INTO Foster (petID, customerID, startDate, endDate)
-                 SELECT ?, ?, CURDATE(), NULL
-                 FROM DUAL
-                 WHERE NOT EXISTS (
-                    SELECT 1
-                    FROM Foster
-                    WHERE petID = ? AND customerID = ?
-                 )`,
-                [petId, customerId, petId, customerId]
+                 SELECT petID, customerID, startDate, endDate
+                 FROM AppliesForAdoption
+                 WHERE applicationID = ?
+                   AND NOT EXISTS (
+                        SELECT 1
+                        FROM Foster
+                        WHERE petID = ? AND customerID = ?
+                   )`,
+                [applicationId, petId, customerId]
             );
 
             await connection.query(
@@ -317,6 +329,7 @@ router.patch("/:applicationId/status", async (req, res) => {
         }
 
         await connection.commit();
+
         return res.status(200).json({
             message: "Application status updated.",
         });
@@ -324,6 +337,7 @@ router.patch("/:applicationId/status", async (req, res) => {
         if (connection) {
             await connection.rollback();
         }
+
         return res.status(500).json({
             message: "Unable to update application status.",
             details: error.message,
